@@ -8,7 +8,7 @@ import java.net.Socket;
 - Parses CLI input
 - Starts ClientServer
 - Starts ClientEndpointManager
-- Could later on implement a centralised server, and connect to all registered clients on start-up
+- TODO: implement a centralised server, and connect to all registered clients on start-up
  */
 public class ClientMain {
     private static final String DEFAULT_HOST_NAME = "localhost";
@@ -26,10 +26,14 @@ public class ClientMain {
         options.addOption("c", "connect", false, "Start-up and connect to another client");
         options.addOption("ch", "connection-host", true, "Remote host-name to connect to");
         options.addOption("cp", "connection-port", true, "Remote port to connect to");
-        options.addOption("n", "name", true, "Enter your client's name");  // could use this to name sessions later maybe?
-        options.addOption("ca", "connect-all", false, "Connect to all existing clients");  // Requires a centralised server to be implemented
 
-        // Sanity check
+        // TODO: use this to name sessions later maybe?
+        options.addOption("n", "name", true, "Enter your client's name");
+
+        // TODO: requires a centralised server to be implemented
+        options.addOption("ca", "connect-all", false, "Connect to all existing clients");
+
+        // Sanity check whilst developing
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("TomCom", options);
 
