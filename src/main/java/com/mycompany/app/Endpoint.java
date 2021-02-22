@@ -1,13 +1,27 @@
 package com.mycompany.app;
 
-public class Endpoint {
-    /*
-    Wraps around connection to another client.
-    I've decided not to use a thread-per-connection model
+import java.net.Socket;
+import java.util.UUID;
 
-    Should be able to:
-    - Send messages to other connection
-    - Receive messages from other connection
-    Should have socket as a class variable
-     */
+/*
+Wraps around connection to another client.
+Uses a thread-per-connection model
+
+Should be able to:
+- Send messages to other connection
+- Receive messages from other connection
+- Maybe implement a keepAliveProtocol later on?
+ */
+public class Endpoint {
+    private final Socket socket;
+    private final UUID uniqueID;
+
+    public Endpoint(Socket socket) {
+        this.socket = socket;
+        uniqueID = UUID.randomUUID();
+    }
+
+    public UUID getUniqueID() {
+        return uniqueID;
+    }
 }
