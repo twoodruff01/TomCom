@@ -11,7 +11,9 @@ Each client can run ClientMain. This starts three threads:
 
 What is an Endpoint? It's a class which wraps around the socket and communications between each client.
 Each Endpoint is a thread, so this is a thread-per-connection model.
+
 -------------------------------------------------------------------------------------------------------------
+
 *How to run it*
 - mvn package
 - java -cp target/TomCom-1.0-SNAPSHOT-jar-with-dependencies.jar com.mycompany.app.ClientMain
@@ -27,9 +29,12 @@ If you can't get that to work, run:
 - java -cp target/TomCom-1.0-SNAPSHOT-jar-with-dependencies.jar com.mycompany.app.ClientMain --help
 
 -------------------------------------------------------------------------------------------------------------
+
 Might add a master-server later which keeps track of all running clients so every client can talk to every
 other client, but can't really be bothered at this point, as it'd be a lot more work.
+
 -------------------------------------------------------------------------------------------------------------
+
 I originally planned to not use a thread-per-connection model until I read this
 https://dzone.com/articles/thousands-of-socket-connections-in-java-practical and realised that is far more
 complicated than what I intended to build
