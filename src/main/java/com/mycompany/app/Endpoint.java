@@ -5,34 +5,28 @@ import java.net.Socket;
 import java.util.UUID;
 
 /*
-java -cp target/TomCom-1.0-SNAPSHOT-jar-with-dependencies.jar com.mycompany.app.ClientMain -n ServySam
-java -cp target/TomCom-1.0-SNAPSHOT-jar-with-dependencies.jar com.mycompany.app.ClientMain -lp 20001 -c -n Tom
-
-Wraps around connection to another client, can:
-- Send messages to other connection
-- Receive messages from other connection
-Each instance has two threads: one for reading console input, and one for getting messages from its socket
+Wraps around both ends of a connection to another client
+- mainly listens for messages from other end of the endpoint
+- can also send messages
+Calling sendString() in this class only communicates with the other end of the socket (one-to-one communication)
 TODO: implement a keepAliveProtocol maybe?
  */
 public class Endpoint extends Thread{
     private final Socket socket;
     private final String localUsername;
-    private final ClientEndpointManager clientEndpointManager;
     private final UUID uniqueID;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private String otherClientUsername = "Unknown User";
-    private Thread consoleListenerThread;
 
     /*
     Message passing variable(s)
      */
     private static final String USERNAME_MESSAGE = "new_username";
 
-    public Endpoint(Socket socket, String username, ClientEndpointManager clientEndpointManager) {
+    public Endpoint(Socket socket, String username) {
         this.socket = socket;
         localUsername = username;
-        this.clientEndpointManager = clientEndpointManager;
         uniqueID = UUID.randomUUID();
         establishSocketReaders();
         this.start();
@@ -40,37 +34,9 @@ public class Endpoint extends Thread{
 
     @Override
     public void run() {
-        sendFromConsole();
+        sendUsername();
         listenForMessages();
-        consoleListenerThread.interrupt();
         super.run();
-    }
-
-    /*
-    Read text input from console whilst socket open, and send over socket.
-     */
-    public void sendFromConsole() {
-        consoleListenerThread = new Thread( () -> {
-            BufferedReader commandLineReader = new BufferedReader(new InputStreamReader(System.in));
-            sendUsername();  // Only need to do this once on start-up.
-            while (!interrupted()) {
-                String outgoingMessage = null;
-                try {
-                    outgoingMessage = commandLineReader.readLine();
-                } catch (IOException e) {
-                    System.out.println("Error reading input from your console: " + e.getMessage());
-                }
-                if (outgoingMessage != null) {
-                    sendString(outgoingMessage);
-                    /*
-                    Maybe should just broadcast by default so can send to all endpoints that have connected?
-                    Like this:
-                        clientEndpointManager.broadcast(outgoingMessage);
-                     */
-                }
-            }
-        });
-        consoleListenerThread.start();
     }
 
     /*
@@ -101,7 +67,7 @@ public class Endpoint extends Thread{
         }
     }
 
-    private void sendString(String message) {
+    public void sendString(String message) {
         try {
             bufferedWriter.write(message + "\n");  // Shared object between threads
             bufferedWriter.flush();
@@ -121,6 +87,7 @@ public class Endpoint extends Thread{
     /*
     Sends this client's username to the other connection, so that connection knows who it's connected to
     Message should be in format: "USERNAME_MESSAGE,greg"
+    Only need to do this once on start-up.
      */
     private void sendUsername() {
         String usernameMessage = USERNAME_MESSAGE + "," + localUsername;

@@ -1,24 +1,39 @@
 A distributed messaging app, only for command-line use.
 
-Each client can run ClientMain. This starts two threads:
-- ClientServer
-- ClientEndpointManager
+I wrote this a few months after finishing the subject Distributed Systems at Melbourne, as a refresher 
+on sockets, threads, and java. Though I wrote all of this, I learnt the patterns 
+(especially for Endpoint.java) from my lecturer Aaron Harwood.
 
-The ClientServer just listens for new connections, wraps an Endpoint around them, and passes them to the
-ClientEndpointManager
+Each client can run ClientMain. This starts three threads:
+1. ClientServer: accepts new endpoints
+2. ClientEndpointManager: manages all endpoints
+3. consoleListenerThread: handles console input (i.e. messaging)
 
-- An Endpoint is a class which wraps around the socket and communications between each client.
+What is an Endpoint? It's a class which wraps around the socket and communications between each client.
 Each Endpoint is a thread, so this is a thread-per-connection model.
+-------------------------------------------------------------------------------------------------------------
+*How to run it*
+- mvn package
+- java -cp target/TomCom-1.0-SNAPSHOT-jar-with-dependencies.jar com.mycompany.app.ClientMain
+- java -cp target/TomCom-1.0-SNAPSHOT-jar-with-dependencies.jar com.mycompany.app.ClientMain -lp 20001 -c -n Frank
+- java -cp target/TomCom-1.0-SNAPSHOT-jar-with-dependencies.jar com.mycompany.app.ClientMain -lp 20002 -c -n Greg
 
-Whilst the ClientEndpointManager takes up an extra thread, it provides the option of refactoring this project
-to not use a thread-per-connection model later on.
+This will start up three different clients. The first client can talk to both of the others simultaneously,
+but the 2nd and 3rd clients can't talk to each other (only the server). So the server act's kind of like a
+publisher and all the processes that connect are subscribing to it (though they can send messages to the
+server individually).
 
-Might also add a master-server later which keeps track of all running clients, but can't really be bothered 
-at this point as it'd be a lot more work.
+If you can't get that to work, run:
+- java -cp target/TomCom-1.0-SNAPSHOT-jar-with-dependencies.jar com.mycompany.app.ClientMain --help
+
+-------------------------------------------------------------------------------------------------------------
+Might add a master-server later which keeps track of all running clients so every client can talk to every
+other client, but can't really be bothered at this point, as it'd be a lot more work.
 -------------------------------------------------------------------------------------------------------------
 I originally planned to not use a thread-per-connection model until I read this
-https://dzone.com/articles/thousands-of-socket-connections-in-java-practical and was
-reminded of how difficult that can be.
+https://dzone.com/articles/thousands-of-socket-connections-in-java-practical and realised that is far more
+complicated than what I intended to build
 
-The ClientEndpointManager was originally intended to manage all the connections (Endpoints) for a client.
-A cool project would be to actually implement this as I originally intended.
+A cool project would be to actually implement this without using a thread for every connection.
+
+Have only tested it with localhost so far.

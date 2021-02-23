@@ -3,6 +3,9 @@ import org.apache.commons.cli.*;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+//java -cp target/TomCom-1.0-SNAPSHOT-jar-with-dependencies.jar com.mycompany.app.ClientMain -n ServySam
+//java -cp target/TomCom-1.0-SNAPSHOT-jar-with-dependencies.jar com.mycompany.app.ClientMain -lp 20001 -c -n Tom
+
 /*
 - Parses CLI input
 - Starts ClientServer
